@@ -35,6 +35,11 @@ RUN : \
 	&& cd .. \
 	&& rm -fr /tmp/ffmpeg
 #ffmpeg-10bit
+
+RUN wget -O /usr/local/bin/docker-entrypoint.sh https://raw.githubusercontent.com/lubbyhst/youtube-dl-webui/master/docker-entrypoint.sh
+RUN wget -O /config.json https://raw.githubusercontent.com/lubbyhst/youtube-dl-webui/master/default_config.json
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # install youtube-dl-webui
 ENV YOUTUBE_DL_WEBUI_SOURCE /usr/src/youtube_dl_webui
 WORKDIR $YOUTUBE_DL_WEBUI_SOURCE
@@ -50,9 +55,6 @@ RUN : \
 	&& apt-get purge -y --auto-remove wget unzip dirmngr \
 	&& rm -fr /var/lib/apt/lists/*
 
-RUN : wget -O /usr/local/bin/docker-entrypoint.sh https://raw.githubusercontent.com/lubbyhst/youtube-dl-webui/master/docker-entrypoint.sh
-RUN : wget -O /config.json https://raw.githubusercontent.com/lubbyhst/youtube-dl-webui/master/default_config.json
-RUN : chmod +x /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 CMD ["python", "-m", "youtube_dl_webui"]
