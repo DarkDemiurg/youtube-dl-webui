@@ -34,27 +34,22 @@ RUN : \
 	&& cp ffmpeg ffprobe qt-faststart /usr/bin \
 	&& cd .. \
 	&& rm -fr /tmp/ffmpeg
-#ffmpeg-10bit
 
-RUN wget -O /usr/local/bin/docker-entrypoint.sh https://raw.githubusercontent.com/lubbyhst/youtube-dl-webui/master/docker-entrypoint.sh
-RUN wget -O /config.json https://raw.githubusercontent.com/lubbyhst/youtube-dl-webui/master/default_config.json
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+# install youtube-dl
+RUN pip install --no-cache-dir youtube-dl flask
 
 # install youtube-dl-webui
+COPY . /usr/src/youtube_dl_webui/
 ENV YOUTUBE_DL_WEBUI_SOURCE /usr/src/youtube_dl_webui
 WORKDIR $YOUTUBE_DL_WEBUI_SOURCE
 
-RUN : \
-	&& pip install --no-cache-dir youtube-dl flask \
-	&& wget -O youtube-dl-webui.zip https://github.com/lubbyhst/youtube-dl-webui/archive/0.2.3-test.zip \
-	&& unzip youtube-dl-webui.zip \
-	&& cd youtube-dl-webui*/ \
-	&& cp -r ./* $YOUTUBE_DL_WEBUI_SOURCE/ \
-	&& ln -s $YOUTUBE_DL_WEBUI_SOURCE/example_config.json /etc/youtube-dl-webui.json \
-	&& cd .. && rm -rf youtube-dl-webui* \
-	&& apt-get purge -y --auto-remove wget unzip dirmngr \
-	&& rm -fr /var/lib/apt/lists/*
+RUN ln -s $YOUTUBE_DL_WEBUI_SOURCE/example_config.json /etc/youtube-dl-webui.json
+
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY default_config.json /config.json
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+EXPOSE 5000
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-
 CMD ["python", "-m", "youtube_dl_webui"]

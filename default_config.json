@@ -9,5 +9,6 @@
         "port": 5000
     },
     "youtube_dl": {
+        "format": "bestvideo[ext=mp4][height<480]+bestaudio[ext=m4a]"
     }
 }
